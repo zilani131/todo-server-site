@@ -18,8 +18,8 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    const taskCollection = client.db("Todolist").collection("sample1");
-    app.get("/home", async (req, res) => {
+    const taskCollection = client.db("Todolist").collection("tasklist");
+    app.get("/task", async (req, res) => {
       const query = {};
       const cursor = taskCollection.find(query);
       const result = await cursor.toArray();
@@ -29,10 +29,8 @@ async function run() {
     app.post("/task",async(req,res)=>{
       const task=req.body;
       console.log(task)
-      const doc={
-        task:task,
-      }
-     const result=await taskCollection.insertOne(doc)
+      
+     const result=await taskCollection.insertOne(task)
      console.log(result)
      res.send(result)
     })
