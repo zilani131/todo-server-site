@@ -5,6 +5,7 @@ const port = process.env.PORT || 5000;
 const app = express();
 app.use(cors());
 app.use(express.json());
+const ObjectId = require("mongodb").ObjectId;
 // pw: 9fYXJTouapDtgZzd
 // user: todolist
 const uri = "mongodb+srv://todolist:9fYXJTouapDtgZzd@cluster0.jeq1a.mongodb.net/?retryWrites=true&w=majority";
@@ -31,6 +32,21 @@ async function run() {
       console.log(task)
       
      const result=await taskCollection.insertOne(task)
+     console.log(result)
+     res.send(result)
+    })
+    app.put("/taskupdate/:id",async(req,res)=>{
+      const id=req.params.id;
+      const task=req.body;
+      console.log(task)
+      const filter={_id:ObjectId(id)}
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          task:task,
+        },
+      };
+     const result=await taskCollection.updateOne(filter, updateDoc, options);
      console.log(result)
      res.send(result)
     })
