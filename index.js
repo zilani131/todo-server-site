@@ -22,7 +22,8 @@ async function run() {
     const taskCollection = client.db("Todolist").collection("tasklist");
     const taskComplete = client.db("Todolist").collection("completedtask");
     app.get("/task", async (req, res) => {
-      const query = {};
+      const email=req.query.email
+      const query = {email:email};
       const cursor = taskCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
@@ -46,15 +47,24 @@ async function run() {
      console.log(result)
      res.send(result)
     })
+    // getting completed task
+    app.get("/completetask",async(req,res)=>{
+      const email=req.query.email
+      const query = {email:email};
+      const result= await taskComplete.find(query).toArray();
+      res.json(result)
+    })
     app.put("/taskupdate/:id",async(req,res)=>{
       const id=req.params.id;
       const task=req.body.task;
+      const email=req.body.email;
       console.log(task)
       const filter={_id:ObjectId(id)}
       const options = { upsert: true };
       const updateDoc = {
         $set: {
           task:task,
+          email:email,
         },
       };
       
