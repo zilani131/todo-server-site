@@ -20,6 +20,7 @@ async function run() {
   try {
     await client.connect();
     const taskCollection = client.db("Todolist").collection("tasklist");
+    const taskComplete = client.db("Todolist").collection("completedtask");
     app.get("/task", async (req, res) => {
       const query = {};
       const cursor = taskCollection.find(query);
@@ -27,6 +28,7 @@ async function run() {
       res.send(result);
       console.log(result);
     });
+    // task adding
     app.post("/task",async(req,res)=>{
       const task=req.body;
       console.log(task)
@@ -35,9 +37,18 @@ async function run() {
      console.log(result)
      res.send(result)
     })
+    // complete task adding
+    app.post("/completetask",async(req,res)=>{
+      const task=req.body;
+      console.log(task)
+      
+     const result=await taskComplete.insertOne(task)
+     console.log(result)
+     res.send(result)
+    })
     app.put("/taskupdate/:id",async(req,res)=>{
       const id=req.params.id;
-      const task=req.body;
+      const task=req.body.task;
       console.log(task)
       const filter={_id:ObjectId(id)}
       const options = { upsert: true };
@@ -46,10 +57,20 @@ async function run() {
           task:task,
         },
       };
+      
+      
      const result=await taskCollection.updateOne(filter, updateDoc, options);
      console.log(result)
-     res.send(result)
+     res.json(result)
     })
+    // completed task dlt from task list
+    app.delete("/dlt/:id",async(req,res)=>{
+      const id=req.params.id;
+      console.log(id);
+          const filter={_id:ObjectId(id)};
+          const result= await taskCollection.deleteOne(filter);
+      res.send(result);
+  })
   } finally {
   }
 }
